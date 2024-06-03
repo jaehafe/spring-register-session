@@ -1,26 +1,6 @@
-spring:
-  jpa:
-    database: postgresql
-    show-sql: true
-    hibernate:
-      # create / create-drop / update / validate / none
-      ddl-auto: create-drop
-      format_sql: true
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    properties:
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
-  datasource:
-    url: jdbc:postgresql://localhost:5432/crash
-    username: leejaeha
-    password: 123456789
+#spring:
+#  profiles:
+#    active: dev
   security:
     user.name: crash-admin
     user.password: 123456789
-logging:
-  level:
-    # TRACE < DEBUG < INFO < WARN < ERROR
-    root: INFO
-
-jwt:
-  secret-key: thisisthesecretkeyaskwzXSKSKLDJkaskldjWjjwjqjk12=
