@@ -23,4 +23,4 @@ logging:
     root: INFO
 
 jwt:
-  secret-key: thisisthesecretkeyaskwzXSKSKLDJkaskldjWjjwjqjk12=
+  secret-key: X3JlZ2lzdGVyX3Nlc3Npb25fc3VwZXJfc2VjcmV0X2tleV8=
