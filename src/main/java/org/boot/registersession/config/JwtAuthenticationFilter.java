@@ -43,6 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             var authenticationToken =
                     new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
             securityContext.setAuthentication(authenticationToken); // SecurityContext에 authenticationToken을 설정
             SecurityContextHolder.setContext(securityContext); // SecurityContextHolder에 SecurityContext 설정
         }
