@@ -16,7 +16,7 @@ public class GlobalExceptionHandler {
         );
     }
 
-    @ExceptionHandler(ClientErrorException.class)
+    @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
         return ResponseEntity.internalServerError().build();
     }
