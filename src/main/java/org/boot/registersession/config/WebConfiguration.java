@@ -1,5 +1,6 @@
 package org.boot.registersession.config;
 
+import org.boot.registersession.model.user.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -45,6 +46,13 @@ public class WebConfiguration {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(HttpMethod.POST, "/api/v1/users", "/api/v1/users/authenticate")
                         .permitAll()
+                        //
+                        .requestMatchers(HttpMethod.GET, "/api/*/session-speakers/**")
+                        .permitAll()
+                        //
+                        .requestMatchers("/api/*/session-speakers", "/api/*/session-speakers/**")
+                        .hasAuthority(Role.ADMIN.name())
+                        //
                         .anyRequest()
                         .authenticated())
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
