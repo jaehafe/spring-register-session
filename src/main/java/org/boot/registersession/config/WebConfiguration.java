@@ -1,5 +1,6 @@
 package org.boot.registersession.config;
 
+import java.util.List;
 import org.boot.registersession.model.user.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,15 +16,14 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
-
 @Configuration
 public class WebConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final JwtExceptionFilter jwtExceptionFilter;
 
-    public WebConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter, JwtExceptionFilter jwtExceptionFilter) {
+    public WebConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter,
+            JwtExceptionFilter jwtExceptionFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
         this.jwtExceptionFilter = jwtExceptionFilter;
     }
@@ -44,20 +44,27 @@ public class WebConfiguration {
         http.
                 cors(Customizer.withDefaults())
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers(HttpMethod.POST, "/api/v1/users", "/api/v1/users/authenticate")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/users",
+                                "/api/v1/users/authenticate")
                         .permitAll()
                         //
-                        .requestMatchers(HttpMethod.GET, "/api/*/session-speakers/**")
+                        .requestMatchers(HttpMethod.GET, "/api/*/session-speakers/**",
+                                "/api/*/crash-sessions",
+                                "/api/*/crash-sessions/**")
                         .permitAll()
                         //
-                        .requestMatchers("/api/*/session-speakers", "/api/*/session-speakers/**")
+                        .requestMatchers("/api/*/session-speakers", "/api/*/session-speakers/**",
+                                "/api/*/crash-sessions",
+                                "/api/*/crash-sessions/**")
                         .hasAuthority(Role.ADMIN.name())
                         //
                         .anyRequest()
                         .authenticated())
-                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(
+                        (session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(CsrfConfigurer::disable)
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtExceptionFilter, JwtAuthenticationFilter.class)
                 .httpBasic(HttpBasicConfigurer::disable);
 

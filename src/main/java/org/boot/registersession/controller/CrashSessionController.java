@@ -6,10 +6,12 @@ import java.util.List;
 import org.boot.registersession.model.crashsession.CrashSession;
 import org.boot.registersession.model.crashsession.CrashSessionPatchRequestBody;
 import org.boot.registersession.model.crashsession.CrashSessionPostRequestBody;
-import org.boot.registersession.model.sessionspeaker.SessionSpeaker;
-import org.boot.registersession.model.sessionspeaker.SessionSpeakerPatchRequestBody;
+import org.boot.registersession.model.crashsession.CrashSessionRegistrationStatus;
+import org.boot.registersession.model.entity.UserEntity;
 import org.boot.registersession.service.CrashSessionService;
+import org.boot.registersession.service.RegistrationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -24,9 +26,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class CrashSessionController {
 
     private final CrashSessionService crashSessionService;
+    private final RegistrationService registrationService;
 
-    public CrashSessionController(CrashSessionService crashSessionService) {
+    public CrashSessionController(CrashSessionService crashSessionService, RegistrationService registrationService) {
         this.crashSessionService = crashSessionService;
+        this.registrationService = registrationService;
     }
 
     @GetMapping
@@ -36,10 +40,19 @@ public class CrashSessionController {
     }
 
     @GetMapping("/{sessionId}")
-    public ResponseEntity<CrashSession> getSessionSpeakerBySpeakerId(
+    public ResponseEntity<CrashSession> getCrashSessionBySessionId(
             @PathVariable(name = "sessionId") Long sessionId) {
         CrashSession crashSession = crashSessionService.getCrashSessionBySessionId(sessionId);
         return ResponseEntity.ok(crashSession);
+    }
+
+    @GetMapping("/{sessionId}/registration-status")
+    public ResponseEntity<CrashSessionRegistrationStatus> getCrashSessionRegistrationStatusBySessionId(
+            @PathVariable(name = "sessionId") Long sessionId,
+            Authentication authentication) {
+        CrashSessionRegistrationStatus registrationStatus = registrationService.getCrashSessionRegistrationStatusBySessionIdAndCurrentUser(
+                sessionId, (UserEntity) authentication.getPrincipal());
+        return ResponseEntity.ok(registrationStatus);
     }
 
     @PostMapping
