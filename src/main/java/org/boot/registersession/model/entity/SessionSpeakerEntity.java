@@ -63,7 +63,7 @@ public class SessionSpeakerEntity {
     }
 
     public static SessionSpeakerEntity of(String company, String name, String description) {
-        var sessionSpeakerEntity = new SessionSpeakerEntity();
+        SessionSpeakerEntity sessionSpeakerEntity = new SessionSpeakerEntity();
         sessionSpeakerEntity.setCompany(company);
         sessionSpeakerEntity.setName(name);
         sessionSpeakerEntity.setDescription(description);
