@@ -7,6 +7,7 @@ import org.boot.registersession.model.crashsession.CrashSessionPatchRequestBody;
 import org.boot.registersession.model.crashsession.CrashSessionPostRequestBody;
 import org.boot.registersession.model.entity.CrashSessionEntity;
 import org.boot.registersession.model.entity.SessionSpeakerEntity;
+import org.boot.registersession.repository.CrashSessionCacheRepository;
 import org.boot.registersession.repository.CrashSessionEntityRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -16,10 +17,14 @@ public class CrashSessionService {
 
     private final CrashSessionEntityRepository crashSessionEntityRepository;
     private final SessionSpeakerService sessionSpeakerService;
+    private final CrashSessionCacheRepository crashSessionCacheRepository;
 
-    public CrashSessionService(CrashSessionEntityRepository crashSessionEntityRepository, SessionSpeakerService sessionSpeakerService) {
+    public CrashSessionService(CrashSessionEntityRepository crashSessionEntityRepository,
+            SessionSpeakerService sessionSpeakerService,
+            CrashSessionCacheRepository crashSessionCacheRepository) {
         this.crashSessionEntityRepository = crashSessionEntityRepository;
         this.sessionSpeakerService = sessionSpeakerService;
+        this.crashSessionCacheRepository = crashSessionCacheRepository;
     }
 
     public List<CrashSession> getCrashSessions() {
@@ -29,13 +34,22 @@ public class CrashSessionService {
     }
 
     public CrashSession getCrashSessionBySessionId(Long sessionId) {
-        CrashSessionEntity crashSessionEntity = getCrashSessionEntityBySessionId(sessionId);
-        return CrashSession.from(crashSessionEntity);
+        return crashSessionCacheRepository
+                .getCrashSessionCache(sessionId)
+                .orElseGet(
+                        () -> {
+                            var crashSessionEntity = getCrashSessionEntityBySessionId(sessionId);
+                            var crashSession = CrashSession.from(crashSessionEntity);
+                            crashSessionCacheRepository.setCrashSessionCache(crashSession);
+                            return crashSession;
+                        });
     }
 
-    public CrashSession createCrashSession(CrashSessionPostRequestBody crashSessionPostRequestBody) {
+    public CrashSession createCrashSession(
+            CrashSessionPostRequestBody crashSessionPostRequestBody) {
         SessionSpeakerEntity sessionSpeakerEntity =
-                sessionSpeakerService.getSessionSpeakerEntityBySpeakerId(crashSessionPostRequestBody.speakerId());
+                sessionSpeakerService.getSessionSpeakerEntityBySpeakerId(
+                        crashSessionPostRequestBody.speakerId());
 
         CrashSessionEntity crashSessionEntity = CrashSessionEntity.of(
                 crashSessionPostRequestBody.title(),
@@ -48,27 +62,28 @@ public class CrashSessionService {
         return CrashSession.from(crashSessionEntityRepository.save(crashSessionEntity));
     }
 
-    public CrashSession updateCrashSession(Long sessionId, CrashSessionPatchRequestBody crashSessionPatchRequestBody) {
+    public CrashSession updateCrashSession(Long sessionId,
+            CrashSessionPatchRequestBody crashSessionPatchRequestBody) {
 
         CrashSessionEntity crashSessionEntity = getCrashSessionEntityBySessionId(sessionId);
 
-        if(!ObjectUtils.isEmpty(crashSessionPatchRequestBody.title())) {
+        if (!ObjectUtils.isEmpty(crashSessionPatchRequestBody.title())) {
             crashSessionEntity.setTitle(crashSessionPatchRequestBody.title());
         }
 
-        if(!ObjectUtils.isEmpty(crashSessionPatchRequestBody.body())) {
+        if (!ObjectUtils.isEmpty(crashSessionPatchRequestBody.body())) {
             crashSessionEntity.setBody(crashSessionPatchRequestBody.body());
         }
 
-        if(!ObjectUtils.isEmpty(crashSessionPatchRequestBody.category())) {
+        if (!ObjectUtils.isEmpty(crashSessionPatchRequestBody.category())) {
             crashSessionEntity.setCategory(crashSessionPatchRequestBody.category());
         }
 
-        if(!ObjectUtils.isEmpty(crashSessionPatchRequestBody.dateTime())) {
+        if (!ObjectUtils.isEmpty(crashSessionPatchRequestBody.dateTime())) {
             crashSessionEntity.setDateTime(crashSessionPatchRequestBody.dateTime());
         }
 
-        if(!ObjectUtils.isEmpty(crashSessionPatchRequestBody.speakerId())) {
+        if (!ObjectUtils.isEmpty(crashSessionPatchRequestBody.speakerId())) {
             SessionSpeakerEntity sessionSpeakerEntity =
                     sessionSpeakerService.getSessionSpeakerEntityBySpeakerId(
                             crashSessionPatchRequestBody.speakerId()

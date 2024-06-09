@@ -12,7 +12,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.ZonedDateTime;
 import java.util.Objects;
-import java.util.Random;
 import lombok.Getter;
 import lombok.Setter;
 import org.boot.registersession.model.crashsession.CrashSessionCategory;

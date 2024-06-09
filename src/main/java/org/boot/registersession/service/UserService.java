@@ -7,6 +7,7 @@ import org.boot.registersession.exception.user.UserNotFoundExceptionClient;
 import org.boot.registersession.model.entity.UserEntity;
 import org.boot.registersession.model.user.User;
 import org.boot.registersession.model.user.UserSignUpRequestBody;
+import org.boot.registersession.repository.UserEntityCacheRepository;
 import org.boot.registersession.repository.UserEntityRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,11 +21,15 @@ public class UserService implements UserDetailsService {
     private final UserEntityRepository userEntityRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final UserEntityCacheRepository userEntityCacheRepository;
 
-    public UserService(UserEntityRepository userEntityRepository, BCryptPasswordEncoder passwordEncoder, JwtService jwtService) {
+    public UserService(UserEntityRepository userEntityRepository,
+            BCryptPasswordEncoder passwordEncoder, JwtService jwtService,
+            UserEntityCacheRepository userEntityCacheRepository) {
         this.userEntityRepository = userEntityRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.userEntityCacheRepository = userEntityCacheRepository;
     }
 
     @Override
@@ -53,7 +58,7 @@ public class UserService implements UserDetailsService {
     public UserAuthenticationResponse authenticate(UserLoginRequestBody userLoginRequestBody) {
         UserEntity UserEntity = getUserEntityByUsername(userLoginRequestBody.username());
 
-        if(passwordEncoder.matches(userLoginRequestBody.password(), UserEntity.getPassword())) {
+        if (passwordEncoder.matches(userLoginRequestBody.password(), UserEntity.getPassword())) {
             String accessToken = jwtService.generateAccessToken(UserEntity);
             return new UserAuthenticationResponse(accessToken);
         } else {
@@ -62,7 +67,15 @@ public class UserService implements UserDetailsService {
     }
 
     private UserEntity getUserEntityByUsername(String username) {
-        return userEntityRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException(username));
+        return userEntityCacheRepository
+                .getUserEntityCache(username)
+                .orElseGet(() -> {
+                    UserEntity userEntity =
+                            userEntityRepository
+                                    .findByUsername(username)
+                                    .orElseThrow(() -> new UsernameNotFoundException(username));
+                    userEntityCacheRepository.setUserEntityCache(userEntity);
+                    return userEntity;
+                });
     }
 }
