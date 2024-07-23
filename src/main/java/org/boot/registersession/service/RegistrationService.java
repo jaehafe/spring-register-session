@@ -18,11 +18,13 @@ public class RegistrationService {
 
     private final RegistrationEntityRepository registrationEntityRepository;
     private final CrashSessionService crashSessionService;
+    private final SlackService slackService;
 
     public RegistrationService(RegistrationEntityRepository registrationEntityRepository,
-            CrashSessionService crashSessionService) {
+            CrashSessionService crashSessionService, SlackService slackService) {
         this.registrationEntityRepository = registrationEntityRepository;
         this.crashSessionService = crashSessionService;
+        this.slackService = slackService;
     }
 
 
@@ -63,7 +65,10 @@ public class RegistrationService {
                 });
 
         RegistrationEntity registrationEntity = RegistrationEntity.of(currentUser, crashSessionEntity);
-        return Registration.from(registrationEntityRepository.save(registrationEntity));
+        Registration registration = Registration.from(registrationEntityRepository.save(registrationEntity));
+        slackService.sendSlackMessage(registration);
+
+        return registration;
     }
 
     public void deleteRegistrationByRegistrationIdAndCurrentUser(Long registrationId, UserEntity currentUser) {

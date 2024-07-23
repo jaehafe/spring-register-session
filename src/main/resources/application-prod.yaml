@@ -1,18 +1,14 @@
+
 spring:
   jpa:
-    database: postgresql
-    show-sql: true
     hibernate:
-      # create / create-drop / update / validate / none
-      ddl-auto: create-drop
-      format_sql: true
+      ddl-auto: create
       naming:
         physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    properties:
-      hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
   datasource:
-    url: jdbc:postgresql://localhost:5432/prod-crash
-    username: leejaeha
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/crash?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: root
     password: 123456789
   security:
     user.name: crash-admin
@@ -24,3 +20,10 @@ logging:
 
 jwt:
   secret-key: X3JlZ2lzdGVyX3Nlc3Npb25fc3VwZXJfc2VjcmV0X2tleV8=
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+server:
+  port: 8080

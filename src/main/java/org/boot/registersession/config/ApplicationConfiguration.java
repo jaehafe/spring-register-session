@@ -15,6 +15,7 @@ import org.boot.registersession.model.sessionspeaker.SessionSpeakerPostRequestBo
 import org.boot.registersession.model.user.UserSignUpRequestBody;
 import org.boot.registersession.service.CrashSessionService;
 import org.boot.registersession.service.SessionSpeakerService;
+import org.boot.registersession.service.SlackService;
 import org.boot.registersession.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,12 +35,14 @@ public class ApplicationConfiguration {
     private final UserService userService;
     private final SessionSpeakerService sessionSpeakerService;
     private final CrashSessionService crashSessionService;
+    private final SlackService slackService;
 
     public ApplicationConfiguration(UserService userService,
-            SessionSpeakerService sessionSpeakerService, CrashSessionService crashSessionService) {
+            SessionSpeakerService sessionSpeakerService, CrashSessionService crashSessionService, SlackService slackService) {
         this.userService = userService;
         this.sessionSpeakerService = sessionSpeakerService;
         this.crashSessionService = crashSessionService;
+        this.slackService = slackService;
     }
 
     @Bean
@@ -47,6 +50,8 @@ public class ApplicationConfiguration {
         return new ApplicationRunner() {
             @Override
             public void run(ApplicationArguments args) throws Exception {
+//                slackService.sendSlackMessage();
+
                 // TODO: 유저 및 세션스피커 생성
                 createTestUsers();
                 createTestSessionSpeakers(10);

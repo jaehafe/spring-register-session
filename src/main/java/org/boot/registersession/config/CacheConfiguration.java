@@ -23,8 +23,8 @@ public class CacheConfiguration {
 
     @Bean
     RedisConnectionFactory redisConnectionFactory(
-            @Value("${redis.host}") String redisHost,
-            @Value("${redis.port}") int redisPort
+            @Value("${data.redis.host}") String redisHost,
+            @Value("${data.redis.port}") int redisPort
     ) {
         var config = new RedisStandaloneConfiguration();
         config.setHostName(redisHost);
@@ -44,28 +44,17 @@ public class CacheConfiguration {
         return template;
     }
 
-//    @Bean
-//    public RedisTemplate<String, CrashSession> crashSessionEntityRedisTemplate(
-//            RedisConnectionFactory redisConnectionFactory
-//    ) {
-//        var template = new RedisTemplate<String, CrashSession>();
-//        template.setConnectionFactory(redisConnectionFactory);
-//        template.setKeySerializer(new StringRedisSerializer());
-//        template.setValueSerializer(
-//                new Jackson2JsonRedisSerializer<CrashSession>(objectMapper, CrashSession.class));
-//        return template;
-//    }
-@Bean(name = "crashSessionRedisTemplate")
-public RedisTemplate<String, CrashSession> crashSessionRedisTemplate(
-        RedisConnectionFactory redisConnectionFactory
-) {
-    var template = new RedisTemplate<String, CrashSession>();
-    template.setConnectionFactory(redisConnectionFactory);
-    template.setKeySerializer(new StringRedisSerializer());
-    template.setValueSerializer(
-            new Jackson2JsonRedisSerializer<CrashSession>(CrashSession.class));
-    return template;
-}
+    @Bean(name = "crashSessionRedisTemplate")
+    public RedisTemplate<String, CrashSession> crashSessionRedisTemplate(
+            RedisConnectionFactory redisConnectionFactory
+    ) {
+        var template = new RedisTemplate<String, CrashSession>();
+        template.setConnectionFactory(redisConnectionFactory);
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(
+                new Jackson2JsonRedisSerializer<CrashSession>(CrashSession.class));
+        return template;
+    }
 
     @Bean(name = "crashSessionsListRedisTemplate")
     public RedisTemplate<String, List<CrashSession>> crashSessionsListRedisTemplate(

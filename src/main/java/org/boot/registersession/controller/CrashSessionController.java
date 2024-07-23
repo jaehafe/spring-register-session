@@ -10,6 +10,7 @@ import org.boot.registersession.model.crashsession.CrashSessionRegistrationStatu
 import org.boot.registersession.model.entity.UserEntity;
 import org.boot.registersession.service.CrashSessionService;
 import org.boot.registersession.service.RegistrationService;
+import org.boot.registersession.service.SlackService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
